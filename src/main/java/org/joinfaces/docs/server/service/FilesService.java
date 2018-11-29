@@ -20,11 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Service
 public class FilesService {
@@ -43,6 +46,35 @@ public class FilesService {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    public void extractZipStream(InputStream inputStream, File destinationDir) throws IOException {
+        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+
+            ZipEntry entry;
+
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+
+                File file = new File(destinationDir, entry.getName());
+
+                if (entry.isDirectory()) {
+                    if (!file.isDirectory() && !file.mkdirs()) {
+                        throw new IOException("Unable to create directory " + file);
+                    }
+                } else {
+                    File dir = file.getParentFile();
+                    if (dir.isDirectory() || dir.mkdirs()) {
+                        Files.copy(zipInputStream, file.toPath());
+                    } else {
+                        throw new IOException("Unable to create file " + file);
+                    }
+                }
+
+                file.setLastModified(entry.getTime());
+
+                zipInputStream.closeEntry();
+            }
+        }
     }
 
 }

@@ -18,19 +18,28 @@ package org.joinfaces.docs.server;
 
 import org.joinfaces.docs.server.service.FilesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.net.URI;
 
 @RestController
-public class ApiController {
+@SpringBootApplication
+@EnableConfigurationProperties(DocsServerProperties.class)
+public class JoinfacesDocsServer {
+
+    public static void main(String[] args) {
+        SpringApplication.run(JoinfacesDocsServer.class, args);
+    }
 
     @Autowired
     private DocsServerProperties docsServerProperties;
@@ -39,7 +48,7 @@ public class ApiController {
     private FilesService filesService;
 
     @PutMapping("/{version}")
-    public ResponseEntity<Void> uploadDocs(InputStream inputStream, @PathVariable String version) throws IOException {
+    public ResponseEntity<Void> uploadDocs(@PathVariable String version, InputStream inputStream) throws IOException {
 
         HttpStatus status = HttpStatus.CREATED;
         File baseDir = new File(docsServerProperties.getWebRoot(), version);
@@ -50,38 +59,14 @@ public class ApiController {
         }
 
         if (!baseDir.isDirectory() && !baseDir.mkdirs()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new IOException("Failed to create directory " + baseDir);
         }
 
-        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-
-            ZipEntry entry;
-
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-
-                File file = new File(baseDir, entry.getName());
-
-                if (entry.isDirectory()) {
-                    if (!file.isDirectory() && !file.mkdirs()) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
-                } else {
-                    File dir = file.getParentFile();
-                    if (dir.isDirectory() || dir.mkdirs()) {
-                        Files.copy(zipInputStream, file.toPath());
-                    } else {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
-                }
-
-                file.setLastModified(entry.getTime());
-
-                zipInputStream.closeEntry();
-            }
-        }
+        filesService.extractZipStream(inputStream, baseDir);
 
         return ResponseEntity.status(status)
-                .lastModified(baseDir.lastModified())
+                .location(URI.create("https://docs.joinfaces.org/" + version))
                 .build();
     }
+
 }

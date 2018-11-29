@@ -16,15 +16,17 @@
 
 package org.joinfaces.docs.server;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@SpringBootApplication
-@EnableConfigurationProperties(DocsServerProperties.class)
-public class JoinfacesDocsServerApplication {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class JoinfacesDocsServerTests {
 
-    public static void main(String[] args) {
-        SpringApplication.run(JoinfacesDocsServerApplication.class, args);
+    @Test
+    public void contextLoads() {
     }
+
 }

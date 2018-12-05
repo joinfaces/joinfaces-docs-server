@@ -16,6 +16,7 @@
 
 package org.joinfaces.docs.server.service;
 
+import lombok.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -26,11 +27,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Service
 public class FilesService {
+
+    public static final Comparator<Version> VERSION_COMPARATOR = Comparator.comparing(Version::getMajor)
+            .thenComparing(Version::getMinor)
+            .thenComparing(Version::getPatch);
 
     public void deleteDirectory(File dir) throws IOException {
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<>() {
@@ -74,6 +83,50 @@ public class FilesService {
 
                 zipInputStream.closeEntry();
             }
+        }
+    }
+
+    public void updateSymlinks(File baseDir) throws IOException {
+
+        Pattern versionPattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+
+        LinkedList<Version> versions = new LinkedList<>();
+
+        for (File file : baseDir.listFiles()) {
+            if (file.isDirectory()) {
+                Matcher matcher = versionPattern.matcher(file.getName());
+                if (matcher.matches()) {
+                    int major = Integer.parseInt(matcher.group(1));
+                    int minor = Integer.parseInt(matcher.group(2));
+                    int patch = Integer.parseInt(matcher.group(3));
+                    versions.add(new Version(major, minor, patch, file));
+                }
+            }
+        }
+
+        versions.sort(VERSION_COMPARATOR);
+        updateCurrentSymlink(baseDir, versions.getLast());
+    }
+
+    private void updateCurrentSymlink(File baseDir, Version currentVersion) throws IOException {
+        Path current = new File(baseDir, "current").toPath();
+
+        Files.deleteIfExists(current);
+
+        Files.createSymbolicLink(current, currentVersion.getFile().toPath());
+    }
+
+    @Value
+    private static class Version implements Comparable<Version> {
+        private int major;
+        private int minor;
+        private int patch;
+        private File file;
+
+        @Override
+        public int compareTo(Version o) {
+            return VERSION_COMPARATOR
+                    .compare(this, o);
         }
     }
 

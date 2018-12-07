@@ -64,7 +64,7 @@ public class JoinfacesDocsServer {
 
         filesService.extractZipStream(inputStream, baseDir);
 
-        filesService.updateSymlinks(baseDir);
+        filesService.updateSymlinks();
 
         return ResponseEntity.status(status)
                 .location(URI.create("https://docs.joinfaces.org/" + version))

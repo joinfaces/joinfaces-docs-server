@@ -16,7 +16,11 @@
 
 package org.joinfaces.docs.server.service;
 
+import lombok.SneakyThrows;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+import org.joinfaces.docs.server.DocsServerProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,15 +31,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@Slf4j
 @Service
 public class FilesService {
+
+    @Autowired
+    private DocsServerProperties docsServerProperties;
 
     public static final Comparator<Version> VERSION_COMPARATOR = Comparator.comparing(Version::getMajor)
             .thenComparing(Version::getMinor)
@@ -86,13 +96,16 @@ public class FilesService {
         }
     }
 
-    public void updateSymlinks(File baseDir) throws IOException {
+    public void updateSymlinks() {
 
         Pattern versionPattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
 
         LinkedList<Version> versions = new LinkedList<>();
 
-        for (File file : baseDir.listFiles()) {
+        File[] files = docsServerProperties.getWebRoot().listFiles();
+        log.info("Updating symlinks for {}", Arrays.toString(files));
+
+        for (File file : files) {
             if (file.isDirectory()) {
                 Matcher matcher = versionPattern.matcher(file.getName());
                 if (matcher.matches()) {
@@ -105,15 +118,35 @@ public class FilesService {
         }
 
         versions.sort(VERSION_COMPARATOR);
-        updateCurrentSymlink(baseDir, versions.getLast());
+        setSymlink("current", versions.getLast().getFile());
+
+        versions.stream()
+                .collect(Collectors.groupingBy(Version::getMajor))
+                .forEach((majorVersion, minorVersions) -> {
+                    minorVersions.sort(VERSION_COMPARATOR);
+
+                    Version latestMinorVersion = minorVersions.get(minorVersions.size() - 1);
+                    setSymlink(String.format("%d.x", majorVersion), latestMinorVersion.getFile());
+
+                    minorVersions.stream()
+                            .collect(Collectors.groupingBy(Version::getMinor))
+                            .forEach((minorVersion, patchVersions) -> {
+                                patchVersions.sort(VERSION_COMPARATOR);
+
+                                Version latestPatchVersion = patchVersions.get(patchVersions.size() - 1);
+                                setSymlink(String.format("%d.%d.x", majorVersion, minorVersion), latestPatchVersion.getFile());
+                            });
+                });
     }
 
-    private void updateCurrentSymlink(File baseDir, Version currentVersion) throws IOException {
-        Path current = new File(baseDir, "current").toPath();
+    @SneakyThrows
+    private void setSymlink(String name, File target) {
+        log.info("Linking {} -> {}", name, target);
+        Path link = new File(docsServerProperties.getWebRoot(), name).toPath();
 
-        Files.deleteIfExists(current);
+        Files.deleteIfExists(link);
 
-        Files.createSymbolicLink(current, currentVersion.getFile().toPath());
+        Files.createSymbolicLink(link, target.toPath());
     }
 
     @Value

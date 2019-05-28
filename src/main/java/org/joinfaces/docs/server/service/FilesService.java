@@ -102,7 +102,7 @@ public class FilesService {
 
         LinkedList<Version> versions = new LinkedList<>();
 
-        File[] files = docsServerProperties.getWebRoot().listFiles();
+        File[] files = docsServerProperties.getBaseDir().listFiles();
         log.info("Updating symlinks for {}", Arrays.toString(files));
 
         for (File file : files) {
@@ -142,7 +142,7 @@ public class FilesService {
     @SneakyThrows
     private void setSymlink(String name, File target) {
         log.info("Linking {} -> {}", name, target);
-        Path link = new File(docsServerProperties.getWebRoot(), name).toPath();
+        Path link = new File(docsServerProperties.getBaseDir(), name).toPath();
 
         Files.deleteIfExists(link);
 

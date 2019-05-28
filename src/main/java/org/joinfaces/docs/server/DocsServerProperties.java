@@ -25,5 +25,6 @@ import java.io.File;
 @ConfigurationProperties("joinfaces-docs")
 public class DocsServerProperties {
 
-    private File webRoot;
+    private File baseDir;
+    private String baseUrl;
 }

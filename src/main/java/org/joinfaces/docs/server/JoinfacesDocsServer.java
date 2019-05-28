@@ -51,7 +51,7 @@ public class JoinfacesDocsServer {
     public ResponseEntity<Void> uploadDocs(@PathVariable String version, InputStream inputStream) throws IOException {
 
         HttpStatus status = HttpStatus.CREATED;
-        File baseDir = new File(docsServerProperties.getWebRoot(), version);
+        File baseDir = new File(docsServerProperties.getBaseDir(), version);
 
         if (baseDir.isDirectory()) {
             filesService.deleteDirectory(baseDir);
@@ -67,7 +67,7 @@ public class JoinfacesDocsServer {
         filesService.updateSymlinks();
 
         return ResponseEntity.status(status)
-                .location(URI.create("https://docs.joinfaces.org/" + version))
+                .location(URI.create(docsServerProperties.getBaseUrl() + version))
                 .build();
     }
 

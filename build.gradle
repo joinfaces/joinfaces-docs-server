@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE"
-        classpath "io.freefair.gradle:lombok-plugin:2.9.1"
+        classpath "io.freefair.gradle:lombok-plugin:3.6.+"
     }
 }
 
@@ -14,7 +14,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: "io.freefair.lombok"
 
 group = 'org.joinfaces.docs'
-sourceCompatibility = 10
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()

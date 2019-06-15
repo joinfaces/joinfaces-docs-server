@@ -80,11 +80,13 @@ public class FilesService {
                     if (!file.isDirectory() && !file.mkdirs()) {
                         throw new IOException("Unable to create directory " + file);
                     }
-                } else {
+                }
+                else {
                     File dir = file.getParentFile();
                     if (dir.isDirectory() || dir.mkdirs()) {
                         Files.copy(zipInputStream, file.toPath());
-                    } else {
+                    }
+                    else {
                         throw new IOException("Unable to create file " + file);
                     }
                 }
@@ -118,7 +120,9 @@ public class FilesService {
         }
 
         versions.sort(VERSION_COMPARATOR);
-        setSymlink("current", versions.getLast().getFile());
+        if (!versions.isEmpty()) {
+            setSymlink("current", versions.getLast().getFile());
+        }
 
         versions.stream()
                 .collect(Collectors.groupingBy(Version::getMajor))

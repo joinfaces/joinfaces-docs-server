@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -48,27 +49,47 @@ public class JoinfacesDocsServer {
     private FilesService filesService;
 
     @PutMapping("/{version}")
-    public ResponseEntity<Void> uploadDocs(@PathVariable String version, InputStream inputStream) throws IOException {
+    public ResponseEntity<Void> uploadDocs(
+            @PathVariable String version,
+            @RequestParam(required = false) String path,
+            InputStream inputStream
+    ) throws IOException {
 
         HttpStatus status = HttpStatus.CREATED;
-        File baseDir = new File(docsServerProperties.getBaseDir(), version);
 
-        if (baseDir.isDirectory()) {
-            filesService.deleteDirectory(baseDir);
+        File baseDir = resolveBaseDir(path);
+
+        File dir = new File(baseDir, version);
+
+        if (dir.isDirectory()) {
+            filesService.deleteDirectory(dir);
             status = HttpStatus.NO_CONTENT;
         }
 
-        if (!baseDir.isDirectory() && !baseDir.mkdirs()) {
-            throw new IOException("Failed to create directory " + baseDir);
+        if (!dir.isDirectory() && !dir.mkdirs()) {
+            throw new IOException("Failed to create directory " + dir);
         }
 
-        filesService.extractZipStream(inputStream, baseDir);
+        filesService.extractZipStream(inputStream, dir);
 
-        filesService.updateSymlinks();
+        filesService.updateSymlinks(baseDir);
 
+        String baseUrl = docsServerProperties.getBaseUrl();
+        if (path != null) {
+            baseUrl = baseUrl + path + "/";
+        }
         return ResponseEntity.status(status)
-                .location(URI.create(docsServerProperties.getBaseUrl() + version))
+                .location(URI.create(baseUrl + version))
                 .build();
+    }
+
+    private File resolveBaseDir(String path) {
+        if (path == null) {
+            return docsServerProperties.getBaseDir();
+        }
+        else {
+            return new File(docsServerProperties.getBaseDir(), path);
+        }
     }
 
 }

@@ -44,9 +44,6 @@ import java.util.zip.ZipInputStream;
 @Service
 public class FilesService {
 
-    @Autowired
-    private DocsServerProperties docsServerProperties;
-
     public static final Comparator<Version> VERSION_COMPARATOR = Comparator.comparing(Version::getMajor)
             .thenComparing(Version::getMinor)
             .thenComparing(Version::getPatch);
@@ -98,13 +95,13 @@ public class FilesService {
         }
     }
 
-    public void updateSymlinks() {
+    public void updateSymlinks(File baseDir) {
 
         Pattern versionPattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
 
         LinkedList<Version> versions = new LinkedList<>();
 
-        File[] files = docsServerProperties.getBaseDir().listFiles();
+        File[] files = baseDir.listFiles();
         log.info("Updating symlinks for {}", Arrays.toString(files));
 
         for (File file : files) {
@@ -121,7 +118,7 @@ public class FilesService {
 
         versions.sort(VERSION_COMPARATOR);
         if (!versions.isEmpty()) {
-            setSymlink("current", versions.getLast().getFile());
+            setSymlink(baseDir, "current", versions.getLast().getFile());
         }
 
         versions.stream()
@@ -130,7 +127,7 @@ public class FilesService {
                     minorVersions.sort(VERSION_COMPARATOR);
 
                     Version latestMinorVersion = minorVersions.get(minorVersions.size() - 1);
-                    setSymlink(String.format("%d.x", majorVersion), latestMinorVersion.getFile());
+                    setSymlink(baseDir, String.format("%d.x", majorVersion), latestMinorVersion.getFile());
 
                     minorVersions.stream()
                             .collect(Collectors.groupingBy(Version::getMinor))
@@ -138,15 +135,15 @@ public class FilesService {
                                 patchVersions.sort(VERSION_COMPARATOR);
 
                                 Version latestPatchVersion = patchVersions.get(patchVersions.size() - 1);
-                                setSymlink(String.format("%d.%d.x", majorVersion, minorVersion), latestPatchVersion.getFile());
+                                setSymlink(baseDir, String.format("%d.%d.x", majorVersion, minorVersion), latestPatchVersion.getFile());
                             });
                 });
     }
 
     @SneakyThrows
-    private void setSymlink(String name, File target) {
+    private void setSymlink(File baseDir, String name, File target) {
         log.info("Linking {} -> {}", name, target);
-        Path link = new File(docsServerProperties.getBaseDir(), name).toPath();
+        Path link = new File(baseDir, name).toPath();
 
         Files.deleteIfExists(link);
 

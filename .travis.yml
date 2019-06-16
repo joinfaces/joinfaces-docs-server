@@ -6,6 +6,7 @@ deploy:
     secure: JPJ4TvphZiMP9JbEsLR1JCn05/3cGRp2vdACMX5i1q/7z1yqk4MDLyjHL76gkfDGdVEmJyL0nlNla4pmjg5Rn1cyyppKoy9nAEO+QsUsZHY2ptuAPtrS6d/vpLTVF/mCGcqbSvdEzL6M3cx/l9QvpTFObCtMM/RuyfFi9U1Pw4FMtPdCFjwTed4WiJ2bJILw9B9pjFCyva5HfuJh122MrTcOFLo5941dFcTo8OJxQSEBKQr3t7/6DALksMgwzS9soDUbqXmNdyAbxpzdvGsLiz1ST/z+j0LdXky9wx52R7we+I/HPD4l3dlpo86rlN0VP8e9F0CU5aDYRR2lW5kmDaaRIdk4mKMgzIvZDBHRCcgdWDQecDKRGutPNO3SVwZR0j3Yfrc8NeLmOGzp6z6//+zj88eIKLYtPf5ru+ce0s2PpyqDNWU+EtCq5gMBFC3mTkUYnmkDKO19zvdx+XtzTa7CUXSd2gSzfqNabjosOmXQ3Z37TMG6vJDboYFtOAoHuwLIxvLiVZUy33N3VVPv2oAlFkHIrqINGJpQKirDJtqMu+uluk3InQpNkV9dxa2Cy1oKTD4EnhGIYzVZfuXeCQvPRocjmNr67dBYS2Tyu2Ycwwbhw9xU520sdjW+7PuV6L01/Wtl34GPkp90aSHTUtq6kXG8etrAKx/OnP80NlI=
   file_glob: true
   file: build/libs/*.jar
+  skip_cleanup: true
   on:
     tags: true
     repo: joinfaces/joinfaces-docs-server

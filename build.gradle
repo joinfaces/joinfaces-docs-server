@@ -2,7 +2,7 @@ plugins {
     id "io.freefair.git-version" version "3.8.4"
     id "java"
     id "io.freefair.lombok" version "3.8.4"
-    id "io.freefair.maven-jars" version "3.8.4"
+    id "io.freefair.maven-jars" version "4.0.0"
     id "org.springframework.boot" version "2.1.7.RELEASE"
     id "io.freefair.aggregate-javadoc-jar" version "3.8.4"
     id "io.freefair.javadoc-links" version "3.8.4"

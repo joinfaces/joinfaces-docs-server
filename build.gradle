@@ -6,7 +6,7 @@ plugins {
     id "org.springframework.boot" version "2.1.8.RELEASE"
     id "io.freefair.aggregate-javadoc-jar" version "4.1.0"
     id "io.freefair.javadoc-links" version "4.1.0"
-    id "io.freefair.okhttp" version "4.1.0"
+    id "io.freefair.okhttp" version "4.1.1"
 }
 
 apply plugin: 'io.spring.dependency-management'

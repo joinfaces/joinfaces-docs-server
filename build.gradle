@@ -1,12 +1,12 @@
 plugins {
-    id "io.freefair.git-version" version "4.1.4"
+    id "io.freefair.git-version" version "4.1.5"
     id "java"
-    id "io.freefair.lombok" version "4.1.4"
-    id "io.freefair.maven-jars" version "4.1.4"
+    id "io.freefair.lombok" version "4.1.5"
+    id "io.freefair.maven-jars" version "4.1.5"
     id "org.springframework.boot" version "2.2.1.RELEASE"
-    id "io.freefair.aggregate-javadoc-jar" version "4.1.4"
-    id "io.freefair.javadoc-links" version "4.1.4"
-    id "io.freefair.okhttp" version "4.1.4"
+    id "io.freefair.aggregate-javadoc-jar" version "4.1.5"
+    id "io.freefair.javadoc-links" version "4.1.5"
+    id "io.freefair.okhttp" version "4.1.5"
 }
 
 apply plugin: 'io.spring.dependency-management'

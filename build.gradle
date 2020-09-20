@@ -14,12 +14,11 @@ buildscript {
 
 plugins {
     id "java"
-    id "org.springframework.boot" version "2.2.2.RELEASE"
+    id "org.springframework.boot" version "2.3.3.RELEASE"
 }
 
 apply plugin: "io.freefair.git-version"
 apply plugin: "io.freefair.lombok"
-apply plugin: "io.freefair.maven-jars"
 apply plugin: "io.freefair.aggregate-javadoc-jar"
 apply plugin: "io.freefair.javadoc-links"
 apply plugin: "io.freefair.okhttp"
@@ -30,6 +29,11 @@ sourceCompatibility = 11
 
 repositories {
     mavenCentral()
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 bootJar {

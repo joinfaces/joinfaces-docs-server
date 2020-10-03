@@ -19,7 +19,6 @@ plugins {
 
 apply plugin: "io.freefair.git-version"
 apply plugin: "io.freefair.lombok"
-apply plugin: "io.freefair.aggregate-javadoc-jar"
 apply plugin: "io.freefair.javadoc-links"
 apply plugin: "io.freefair.okhttp"
 apply plugin: 'io.spring.dependency-management'
@@ -54,9 +53,9 @@ dependencies {
 apply plugin: "io.freefair.okhttp"
 
 task uploadDocumentation(type: io.freefair.gradle.plugins.okhttp.tasks.UploadFile) {
-    dependsOn "aggregateJavadocJar"
+    dependsOn "javadocJar"
     username = "user"
     password = findProperty('joinfacesDocsPass')
-    file = aggregateJavadocJar.archiveFile
+    file = javadocJar.archiveFile
     url = "https://docs.joinfaces.org/api/$project.version?path=joinfaces-docs-server"
 }

@@ -11,8 +11,3 @@ deploy:
     on:
       tags: true
       repo: joinfaces/joinfaces-docs-server
-  - provider: script
-    skip_cleanup: true
-    script: "./gradlew uploadDocumentation -s"
-    on:
-      repo: joinfaces/joinfaces-docs-server

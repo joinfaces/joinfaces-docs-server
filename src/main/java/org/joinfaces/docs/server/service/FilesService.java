@@ -19,18 +19,13 @@ package org.joinfaces.docs.server.service;
 import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.joinfaces.docs.server.DocsServerProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -47,22 +42,6 @@ public class FilesService {
     public static final Comparator<Version> VERSION_COMPARATOR = Comparator.comparing(Version::getMajor)
             .thenComparing(Version::getMinor)
             .thenComparing(Version::getPatch);
-
-    public void deleteDirectory(File dir) throws IOException {
-        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-    }
 
     public void extractZipStream(InputStream inputStream, File destinationDir) throws IOException {
         try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {

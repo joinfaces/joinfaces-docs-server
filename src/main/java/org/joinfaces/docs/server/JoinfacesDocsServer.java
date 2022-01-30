@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,7 +63,7 @@ public class JoinfacesDocsServer {
         File dir = new File(baseDir, version);
 
         if (dir.isDirectory()) {
-            filesService.deleteDirectory(dir);
+            FileSystemUtils.deleteRecursively(dir);
             status = HttpStatus.NO_CONTENT;
         }
 

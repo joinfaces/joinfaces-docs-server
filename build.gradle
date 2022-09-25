@@ -24,13 +24,15 @@ apply plugin: "io.freefair.okhttp"
 apply plugin: 'io.spring.dependency-management'
 
 group = 'org.joinfaces.docs'
-sourceCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
     withSourcesJar()
     withJavadocJar()
 }

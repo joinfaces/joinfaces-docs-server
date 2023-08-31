@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 
 @RestController
 public class UploadController {
@@ -69,12 +69,14 @@ public class UploadController {
 
         filesService.updateSymlinks(baseDir);
 
-        String baseUrl = docsServerProperties.getBaseUrl();
+        ServletUriComponentsBuilder servletUriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentContextPath();
+
         if (path != null) {
-            baseUrl = baseUrl + path + "/";
+            servletUriComponentsBuilder.path(path);
         }
+        servletUriComponentsBuilder.pathSegment(version);
         return ResponseEntity.status(status)
-                .location(URI.create(baseUrl + version))
+                .location(servletUriComponentsBuilder.build().toUri())
                 .build();
     }
 

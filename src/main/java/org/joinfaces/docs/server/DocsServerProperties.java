@@ -26,5 +26,4 @@ import java.io.File;
 public class DocsServerProperties {
 
     private File baseDir;
-    private String baseUrl;
 }

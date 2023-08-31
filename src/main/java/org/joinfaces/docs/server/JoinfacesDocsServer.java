@@ -16,13 +16,22 @@
 
 package org.joinfaces.docs.server;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.tika.Tika;
+import org.apache.tika.config.TikaConfig;
 import org.joinfaces.docs.server.service.FilesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,8 +42,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 
-@RestController
+@Slf4j
 @SpringBootApplication
 @EnableConfigurationProperties(DocsServerProperties.class)
 public class JoinfacesDocsServer {
@@ -43,54 +54,9 @@ public class JoinfacesDocsServer {
         SpringApplication.run(JoinfacesDocsServer.class, args);
     }
 
-    @Autowired
-    private DocsServerProperties docsServerProperties;
-
-    @Autowired
-    private FilesService filesService;
-
-    @PutMapping("/{version}")
-    public ResponseEntity<Void> uploadDocs(
-            @PathVariable String version,
-            @RequestParam(required = false) String path,
-            InputStream inputStream
-    ) throws IOException {
-
-        HttpStatus status = HttpStatus.CREATED;
-
-        File baseDir = resolveBaseDir(path);
-
-        File dir = new File(baseDir, version);
-
-        if (dir.isDirectory()) {
-            FileSystemUtils.deleteRecursively(dir);
-            status = HttpStatus.NO_CONTENT;
-        }
-
-        if (!dir.isDirectory() && !dir.mkdirs()) {
-            throw new IOException("Failed to create directory " + dir);
-        }
-
-        filesService.extractZipStream(inputStream, dir);
-
-        filesService.updateSymlinks(baseDir);
-
-        String baseUrl = docsServerProperties.getBaseUrl();
-        if (path != null) {
-            baseUrl = baseUrl + path + "/";
-        }
-        return ResponseEntity.status(status)
-                .location(URI.create(baseUrl + version))
-                .build();
-    }
-
-    private File resolveBaseDir(String path) {
-        if (path == null) {
-            return docsServerProperties.getBaseDir();
-        }
-        else {
-            return new File(docsServerProperties.getBaseDir(), path);
-        }
+    @Bean
+    public Tika tika() {
+        return new Tika();
     }
 
 }

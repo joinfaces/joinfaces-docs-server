@@ -1,0 +1,76 @@
+<!--
+  ~ Copyright 2023 https://github.com/joinfaces
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title th:text="|Index of ${path}|">Index of /foo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style>
+        .icon {
+            vertical-align: middle;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body class="container">
+
+<h1 th:text="|Index of ${path}|">Index of /path</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Last Modified</th>
+        <th>Size</th>
+        <th>Type</th>
+    </tr>
+    </thead>
+    <tbody class="table-group-divider">
+    <tr th:if="${path} != '/'">
+        <td class="icon">
+            <i class="fa-regular fa-folder"></i>
+        </td>
+        <td>
+            <a href="../">../</a>
+        </td>
+        <td>-</td>
+        <td>-</td>
+        <td>folder</td>
+    </tr>
+    <tr th:each="entry : ${entries}">
+        <td class="icon">
+            <i th:class="${entry.iconClass}"></i>
+        </td>
+        <td>
+            <a th:href="@{${entry.fullPath}}" th:text="${entry.name}"></a>
+        </td>
+        <td th:text="${#temporals.format(entry.lastModified, 'MEDIUM')}"></td>
+        <td th:text="${entry.size}"></td>
+        <td th:text="${entry.mimeType}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+
+</html>

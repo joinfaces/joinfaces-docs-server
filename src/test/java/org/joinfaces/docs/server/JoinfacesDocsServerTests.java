@@ -72,7 +72,7 @@ public class JoinfacesDocsServerTests {
 
         new HttpEntity<>(out.toByteArray());
 
-        ResponseEntity<Void> response = restTemplate.exchange("/1.2.3", HttpMethod.PUT, new HttpEntity<>(out.toByteArray()), void.class);
+        ResponseEntity<Void> response = restTemplate.exchange("/api/1.2.3", HttpMethod.PUT, new HttpEntity<>(out.toByteArray()), void.class);
 
         URI location = response.getHeaders().getLocation();
         assertThat(location).hasPath("/1.2.3");
@@ -104,7 +104,7 @@ public class JoinfacesDocsServerTests {
 
         new HttpEntity<>(out.toByteArray());
 
-        ResponseEntity<Void> response = restTemplate.exchange("/1.2.3?path=foo", HttpMethod.PUT, new HttpEntity<>(out.toByteArray()), void.class);
+        ResponseEntity<Void> response = restTemplate.exchange("/api/1.2.3?path=foo", HttpMethod.PUT, new HttpEntity<>(out.toByteArray()), void.class);
 
         URI location = response.getHeaders().getLocation();
         assertThat(location).hasPath("/foo/1.2.3");

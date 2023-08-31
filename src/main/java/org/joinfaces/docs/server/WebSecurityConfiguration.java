@@ -18,9 +18,11 @@ package org.joinfaces.docs.server;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -29,7 +31,16 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeHttpRequests -> {
+                    authorizeHttpRequests.requestMatchers(HttpMethod.DELETE).authenticated();
+                    authorizeHttpRequests.requestMatchers(HttpMethod.POST).authenticated();
+                    authorizeHttpRequests.requestMatchers(HttpMethod.PUT).authenticated();
+                    authorizeHttpRequests.anyRequest().permitAll();
+                })
+                .headers(headers -> {
+                    headers.cacheControl(HeadersConfigurer.CacheControlConfig::disable);
+                    headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
+                })
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults());
 

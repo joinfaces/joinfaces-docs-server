@@ -16,6 +16,7 @@
 
 package org.joinfaces.docs.server.controller;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.joinfaces.docs.server.DocsServerProperties;
@@ -35,6 +36,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -51,18 +53,38 @@ public class FileController {
     @Autowired
     private MimeTypeService mimeTypeService;
 
+    private String baseDirPath;
+
+    private CacheControl symlinkCacheControl;
+
+    private CacheControl nonSymlinkCacheControl;
+
+    @PostConstruct
+    void init() throws IOException {
+        baseDirPath = docsServerProperties.getBaseDir().getCanonicalPath();
+
+        symlinkCacheControl = CacheControl.noCache()
+                .mustRevalidate()
+                .staleIfError(Duration.ofMinutes(30))
+                .staleWhileRevalidate(Duration.ofMinutes(1));
+
+        nonSymlinkCacheControl = CacheControl.maxAge(Duration.ofDays(1))
+                .sMaxAge(Duration.ofDays(1))
+                .cachePublic();
+    }
+
     @GetMapping("/**")
     public Object process(HttpServletRequest request, WebRequest webRequest) throws IOException {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
         File file = new File(docsServerProperties.getBaseDir(), path);
 
-        if (!file.getCanonicalPath().startsWith(docsServerProperties.getBaseDir().getCanonicalPath())) {
-            return ResponseEntity.badRequest().build();
-        }
-
         if (!file.exists()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!file.getCanonicalPath().startsWith(baseDirPath)) {
+            return ResponseEntity.badRequest().build();
         }
 
         if (file.isFile()) {
@@ -76,7 +98,7 @@ public class FileController {
         return null;
     }
 
-    private Object directoryResponse(WebRequest webRequest, String path, File directory) {
+    private Object directoryResponse(WebRequest webRequest, String path, File directory) throws IOException {
         Assert.state(directory.isDirectory(), "directory is not a directory");
         if (!path.endsWith("/")) {
             return new RedirectView(path + "/", true);
@@ -104,7 +126,8 @@ public class FileController {
         return modelAndView;
     }
 
-    private ResponseEntity<FileSystemResource> fileResponse(WebRequest webRequest, File file) {
+    private ResponseEntity<FileSystemResource> fileResponse(WebRequest webRequest, File file) throws IOException {
+        Assert.state(file.isFile(), "file is not a file");
         if (webRequest.checkNotModified(file.lastModified())) {
             return null;
         }
@@ -115,15 +138,19 @@ public class FileController {
             mediaType = MediaType.TEXT_PLAIN;
         }
 
+        CacheControl cacheControl;
+        if (file.getAbsolutePath().equals(file.getCanonicalPath())) {
+            cacheControl = nonSymlinkCacheControl;
+        } else {
+            cacheControl = symlinkCacheControl;
+        }
+
         return ResponseEntity.ok()
                 .header("Content-Disposition", ContentDisposition.inline().filename(file.getName()).build().toString())
                 .lastModified(file.lastModified())
                 .contentLength(file.length())
                 .contentType(mediaType)
-                .cacheControl(CacheControl.noCache()
-                        .mustRevalidate()
-                        .staleIfError(Duration.ofMinutes(30))
-                        .staleWhileRevalidate(Duration.ofMinutes(1)))
+                .cacheControl(cacheControl)
                 .body(new FileSystemResource(file));
     }
 

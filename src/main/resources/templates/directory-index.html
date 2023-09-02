@@ -48,7 +48,7 @@
     <tbody class="table-group-divider">
     <tr th:if="${path} != '/'">
         <td class="icon">
-            <i class="fa-regular fa-folder"></i>
+            <i class="fa-fw fa-regular fa-folder-open"></i>
         </td>
         <td>
             <a href="../">../</a>
@@ -59,13 +59,14 @@
     </tr>
     <tr th:each="entry : ${entries}">
         <td class="icon">
-            <i th:class="${entry.iconClass}"></i>
+            <i class="fa-fw fa-regular fa-folder" th:if="${entry.directory}"></i>
+            <i th:class="${'fa-fw fa-regular ' + @iconService.getIconClass(entry.mimeType)}" th:if="${entry.isFile()}"></i>
         </td>
         <td>
             <a th:href="@{${entry.fullPath}}" th:text="${entry.name}"></a>
         </td>
         <td th:text="${#temporals.format(entry.lastModified, 'MEDIUM')}"></td>
-        <td th:text="${entry.size}"></td>
+        <td th:text="${{entry.size}}"></td>
         <td th:text="${entry.mimeType}"></td>
     </tr>
     </tbody>

@@ -16,7 +16,6 @@
 
 package org.joinfaces.docs.server.service;
 
-import jakarta.servlet.ServletContext;
 import lombok.SneakyThrows;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +24,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.file.Files;
 
 @Service
 public class MimeTypeService {
-
-    @Autowired
-    private ServletContext servletContext;
 
     @Autowired
     private Tika tika;
@@ -44,15 +39,7 @@ public class MimeTypeService {
             return null;
         }
 
-        String mimeType = servletContext.getMimeType(file.getPath());
-
-        if (mimeType == null) {
-            mimeType = Files.probeContentType(file.toPath());
-        }
-
-        if (mimeType == null) {
-            mimeType = tika.detect(file);
-        }
+        String mimeType = tika.detect(file);
 
         if (mimeType != null) {
             return MediaType.parseMediaType(mimeType);

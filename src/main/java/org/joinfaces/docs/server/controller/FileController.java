@@ -36,7 +36,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +76,7 @@ public class FileController {
     public Object process(HttpServletRequest request, WebRequest webRequest) throws IOException {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
-        File file = new File(docsServerProperties.getBaseDir(), path);
+        File file = new File(baseDirPath, path);
 
         if (!file.exists()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -146,9 +145,8 @@ public class FileController {
         }
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", ContentDisposition.inline().filename(file.getName()).build().toString())
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(file.getName()).build().toString())
                 .lastModified(file.lastModified())
-                .contentLength(file.length())
                 .contentType(mediaType)
                 .cacheControl(cacheControl)
                 .body(new FileSystemResource(file));

@@ -14,6 +14,7 @@ jobs:
     env:
       ORG_GRADLE_PROJECT_joinfacesDocsUser: ${{ secrets.JOINFACES_DOCS_USER }}
       ORG_GRADLE_PROJECT_joinfacesDocsPass: ${{ secrets.JOINFACES_DOCS_PASS }}
+      ORG_GRADLE_PROJECT_joinfacesBuildCachePassword: ${{ secrets.BUILD_CACHE_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17

@@ -1,19 +1,17 @@
 plugins {
     id "io.freefair.settings.plugin-versions" version "8.11"
-    id "com.gradle.enterprise" version "3.18.1"
+    id "com.gradle.develocity" version "3.18.2"
 }
 
 rootProject.name = 'joinfaces-docs-server'
 
 boolean isCiServer = System.getenv().containsKey("CI")
 
-gradleEnterprise {
-    if (isCiServer) {
-        buildScan {
-            publishAlways()
-            termsOfServiceUrl = "https://gradle.com/terms-of-service"
-            termsOfServiceAgree = "yes"
-        }
+develocity {
+    buildScan {
+        publishing.onlyIf { isCiServer }
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
     }
 }
 

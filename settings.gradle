@@ -1,6 +1,6 @@
 plugins {
     id "io.freefair.settings.plugin-versions" version "8.11"
-    id "com.gradle.enterprise" version "3.18.1"
+    id "com.gradle.enterprise" version "3.18.2"
 }
 
 rootProject.name = 'joinfaces-docs-server'

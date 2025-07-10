@@ -40,7 +40,7 @@ dependencies {
     implementation 'org.apache.tika:tika-core:3.2.1'
 
     implementation 'org.webjars:webjars-locator-core'
-    implementation 'org.webjars:bootstrap:5.3.5'
+    implementation 'org.webjars:bootstrap:5.3.7'
     implementation 'org.webjars:font-awesome:6.7.2'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

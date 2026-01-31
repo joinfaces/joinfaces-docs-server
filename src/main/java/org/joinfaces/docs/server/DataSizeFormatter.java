@@ -16,8 +16,8 @@
 
 package org.joinfaces.docs.server;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.format.Printer;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.unit.DataSize;
 
@@ -28,7 +28,7 @@ public class DataSizeFormatter implements Printer<DataSize> {
 
     @Override
     @NonNull
-    public String print(DataSize object, Locale locale) {
+    public String print(DataSize object, @NonNull Locale locale) {
 
         long bytes = object.toBytes();
 

@@ -19,21 +19,42 @@ package org.joinfaces.docs.server.service;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
 public class IconService {
 
-    Map<MediaType, String> icons = Map.of(
-            MediaType.APPLICATION_XML, "fa-file-code",
-            MediaType.TEXT_HTML, "fa-file-code",
-            MediaType.parseMediaType("application/*+xml"), "fa-file-code",
-            MediaType.parseMediaType("application/java-archive"), "fa-file-zipper",
-            MediaType.parseMediaType("audio/*"), "fa-file-audio",
-            MediaType.parseMediaType("video/*"), "fa-file-video",
-            MediaType.parseMediaType("image/*"), "fa-file-image",
-            MediaType.parseMediaType("text/*"), "fa-file-lines"
-    );
+    Map<MediaType, String> icons;
+
+    public IconService() {
+
+        icons = new LinkedHashMap<>();
+        icons.put(MediaType.APPLICATION_XML, "fa-file-code");
+        icons.put(MediaType.TEXT_HTML, "fa-file-code");
+        icons.put(MediaType.parseMediaType("application/*+xml"), "fa-file-code");
+
+        icons.put(MediaType.parseMediaType("application/java-archive"), "fa-file-zipper");
+        icons.put(MediaType.parseMediaType("application/zip"), "fa-file-zipper");
+        icons.put(MediaType.parseMediaType("application/x-tar"), "fa-file-zipper");
+        icons.put(MediaType.parseMediaType("application/x-bzip2"), "fa-file-zipper");
+        icons.put(MediaType.parseMediaType("application/zlib"), "fa-file-zipper");
+
+        icons.put(MediaType.parseMediaType("application/vnd.ms-excel"), "fa-file-excel");
+        icons.put(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"), "fa-file-excel");
+
+        icons.put(MediaType.parseMediaType("application/msword"), "fa-file-word");
+        icons.put(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"), "fa-file-word");
+
+        icons.put(MediaType.parseMediaType("text/csv"), "fa-file-csv");
+        icons.put(MediaType.parseMediaType("application/pdf"), "fa-file-pdf");
+
+        icons.put(MediaType.parseMediaType("audio/*"), "fa-file-audio");
+        icons.put(MediaType.parseMediaType("video/*"), "fa-file-video");
+        icons.put(MediaType.parseMediaType("image/*"), "fa-file-image");
+        icons.put(MediaType.parseMediaType("text/*"), "fa-file-lines");
+
+    }
 
     public String getIconClass(MediaType mediaType) {
 

@@ -17,7 +17,6 @@
 package org.joinfaces.docs.server.controller;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.joinfaces.docs.server.DocsServerProperties;
 import org.joinfaces.docs.server.model.EntryInfo;
@@ -28,9 +27,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -72,18 +71,16 @@ public class FileController {
                 .cachePublic();
     }
 
-    @GetMapping("/**")
-    public Object process(HttpServletRequest request, WebRequest webRequest) throws IOException {
-        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-
+    @GetMapping("/{*path}")
+    public Object process(@PathVariable String path, WebRequest webRequest) throws IOException {
         File file = new File(baseDirPath, path);
-
-        if (!file.exists()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
 
         if (!file.getCanonicalPath().startsWith(baseDirPath)) {
             return ResponseEntity.badRequest().build();
+        }
+
+        if (!file.exists()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         if (file.isFile()) {

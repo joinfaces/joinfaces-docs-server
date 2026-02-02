@@ -23,6 +23,10 @@ java {
     withJavadocJar()
 }
 
+application {
+    mainClass = "org.joinfaces.docs.server.JoinfacesDocsServer"
+}
+
 test {
     useJUnitPlatform()
 }
